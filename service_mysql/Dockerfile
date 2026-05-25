@@ -12,8 +12,12 @@ WORKDIR /app
 
 COPY . .
 
+COPY wait-for-it.sh /usr/local/bin/wait-for-it.sh
+
+RUN chmod +x /usr/local/bin/wait-for-it.sh
+
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
 EXPOSE 8000
 
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+CMD ["/usr/local/bin/wait-for-it.sh", "mysql-db:3306", "-t", "60", "--", "sh", "-c", "php artisan migrate && php artisan serve --host=0.0.0.0 --port=8000"]

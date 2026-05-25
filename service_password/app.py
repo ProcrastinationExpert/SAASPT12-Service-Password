@@ -43,6 +43,13 @@ def add_password():
 @app.route('/python-service/passwords', methods=['GET'])
 def get_passwords():
     response = requests.get(PHP_SERVICE_URL)
+    if response.status_code != 200:
+        return jsonify({
+            "success": False,
+            "message": f"Laravel menolak dengan status {response.status_code}",
+            "detail": response.text
+        }), response.status_code
+
     if response.status_code == 200:
         passwords = response.json()
         for pwd in passwords:
