@@ -23,10 +23,12 @@ app.use(
       "^/api/gateway/passwords": "/python-service/passwords",
     },
     logger: console, // Biar kelihatan log traffic-nya di terminal
-    onProxyReq: (proxyReq, req, res) => {
-      console.log(
-        `[Gateway Proxy] Forwarding ${req.method} request to Python Service`,
-      );
+    on: {
+      proxyReq: (proxyReq, req, res) => {
+        console.log(
+          `[Gateway Proxy] Forwarding ${req.method} request to Python Service`,
+        );
+      },
     },
   }),
 );
@@ -37,6 +39,6 @@ if (!PORT) {
   process.exit(1);
 }
 
-app.listen("0.0.0.0", PORT, () =>
+app.listen(PORT, "0.0.0.0", () =>
   console.log(`Node.js Reverse Proxy Gateway running on port ${PORT}`),
 );
