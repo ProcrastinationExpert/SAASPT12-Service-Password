@@ -1,0 +1,54 @@
+version: "3.8"
+
+services:
+  # 1. Database MySQL
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: pt12_db_password
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  laravel-service:
+    build:
+      context: ./service_mysql
+    container_name: laravel-service
+    restart: unless-stopped
+    env_file:
+      - ./service_mysql/.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql-db
+
+  python-service:
+    build:
+      context: ./service_password
+    container_name: python-service
+    restart: unless-stopped
+    env_file:
+      - ./service_password/.env
+    ports:
+      - "5000:5000"
+    depends_on:
+      - laravel-service
+
+  api-gateway:
+    build:
+      context: ./api_gateway
+    container_name: api-gateway
+    restart: unless-stopped
+    env_file:
+      - ./api_gateway/.env
+    ports:
+      - "3000:3000"
+    depends_on:
+      - python-service
+
+volumes:
+  db_data:
